@@ -60,13 +60,16 @@
   function home() {
     stop();
     if (!S.subject) return landing();
-    const d = deck(), items = d.items, mast = items.filter(x => P.mastered(d.id, x.id)).length;
+    const d = deck(), items = d.items, isT = d.type === 'table', gl = MDK.gamesFor(d);
+    if (!gl.some(g => g.id === S.game)) { S.game = gl[0].id; save(); }
+    document.body.classList.toggle('hints-on', S.hints && !isT);
+    const mast = items.filter(x => P.mastered(d.id, x.id)).length;
     const weakN = items.filter(x => P.weak(d.id, x.id)).length, sample = items[Math.random() * items.length | 0];
     const decks = subjectDecks(), subj = MDK.subjects[S.subject];
     app.innerHTML = `
     <header class="hero">
       <div class="brand"><button class="logo back-logo" id="subjects" aria-label="חזרה לבחירת מקצוע">MD</button><div><h1>${esc(subj.title)}</h1><p>MD.K · אימון כרטיס אחרי כרטיס</p></div></div>
-      <div class="hero-mol" aria-hidden="true">${MDK.render(sample, 'show-hl')}<span dir="ltr">${esc(sample.name)}</span></div>
+      ${isT ? '' : `<div class="hero-mol" aria-hidden="true">${MDK.render(sample, 'show-hl')}<span dir="ltr">${esc(sample.name)}</span></div>`}
     </header>
     <main class="wrap">
       ${decks.length > 1 ? `<nav class="decks">${decks.map(x => `<button class="deck-tab" aria-pressed="${x.id === d.id}" data-deck="${esc(x.id)}">${esc(x.title)}</button>`).join('')}</nav>` : ''}
@@ -78,16 +81,16 @@
         <div class="mastery"><div class="bar"><i style="width:${(mast / items.length * 100).toFixed(0)}%"></i></div>
           <span>שולטת ב-${mast} מתוך ${items.length}</span></div>
 
-        <h3>משחק</h3>${seg('game', Object.values(MDK.games).map(g => [g.id, g.title]))}
-        <h3>כיוון</h3>${seg('dir', [['s2n', 'ממבנה לשם'], ['n2s', 'משם למבנה'], ['mix', 'מעורב']])}
-        <h3>נושאים</h3>
+        <h3>משחק</h3>${seg('game', gl.map(g => [g.id, g.title]))}
+        ${isT ? '' : `<h3>כיוון</h3>${seg('dir', [['s2n', 'ממבנה לשם'], ['n2s', 'משם למבנה'], ['mix', 'מעורב']])}`}
+        ${Object.keys(d.cats).length ? `<h3>נושאים</h3>
         <div class="chips">
           <button class="cat" aria-pressed="${!S.cats.length}" data-cat="">הכל</button>
           ${Object.entries(d.cats).map(([k, l]) => `<button class="cat" aria-pressed="${S.cats.includes(k)}" data-cat="${k}"><span class="sw c-${k}"></span>${esc(l)}</button>`).join('')}
-        </div>
+        </div>` : ''}
         <h3>אורך סבב</h3>${seg('n', [[10, '10'], [20, '20'], [0, 'הכל']])}
         <div class="toggles">
-          ${hintBtn()}
+          ${isT ? '' : hintBtn()}
           <button class="tg" id="weak" aria-pressed="${S.weak}" ${weakN ? '' : 'disabled'}><span class="dot"></span>רק מה שצריך חזרה${weakN ? ` (${weakN})` : ''}</button>
         </div>
         <p class="warn" id="warn" hidden></p>
@@ -104,7 +107,7 @@
       if (S.cats.length === Object.keys(d.cats).length) S.cats = [];
       save(); home(); });
     app.querySelectorAll('.deck-tab').forEach(b => b.onclick = () => { S.deck = b.dataset.deck; S.cats = []; save(); home(); });
-    app.querySelector('.hint-tg').onclick = () => setHints(!S.hints);
+    const ht = app.querySelector('.hint-tg'); if (ht) ht.onclick = () => setHints(!S.hints);
     app.querySelector('#weak').onclick = () => { S.weak = !S.weak; save(); home(); };
     app.querySelector('#subjects').onclick = landing;
     app.querySelector('#browse').onclick = browse;
@@ -122,11 +125,11 @@
     const d = deck(), n = Math.min(S.n || items.length, items.length);
     app.innerHTML = `<div class="play">
       <div class="playbar"><button class="icon x" aria-label="יציאה">✕</button>
-        <div class="meter"><i></i></div><span class="count"></span>${hintBtn()}</div>
+        <div class="meter"><i></i></div><span class="count"></span>${d.type === 'table' ? '' : hintBtn()}</div>
       <div class="stage wrap"></div></div>`;
     const stage = app.querySelector('.stage'), meter = app.querySelector('.meter i'), count = app.querySelector('.count');
     app.querySelector('.x').onclick = home;
-    app.querySelector('.hint-tg').onclick = () => setHints(!S.hints);
+    const ht = app.querySelector('.hint-tg'); if (ht) ht.onclick = () => setHints(!S.hints);
     window.scrollTo(0, 0);
     running = MDK.games[S.game].start(stage, {
       deck: d, items, n, dir: S.dir,
@@ -155,27 +158,33 @@
     app.querySelector('#again').onclick = () => play(items);
     app.querySelector('#menu').onclick = home;
     const am = app.querySelector('#again-missed');
-    if (am) am.onclick = () => play(missed.length >= 2 ? missed : [...missed, ...MDK.distractors(deck(), missed[0], 1)]);
+    if (am) am.onclick = () => play(missed.length >= 2 ? missed : [...missed, ...(deck().type === 'table' ? deck().items.filter(x => x !== missed[0]).slice(0, 1) : MDK.distractors(deck(), missed[0], 1))]);
   }
 
   /* ---------- browse ---------- */
   function card(it) {
-    const r = P.item(S.deck, it.id), n = r.c + r.w;
-    return `<div class="fcard"><div class="fpic">${MDK.render(it)}</div><div class="fname" dir="ltr" lang="en">${esc(it.name)}</div>
+    const r = P.item(S.deck, it.id), n = r.c + r.w, d = deck();
+    const head = d.type === 'table'
+      ? `<div class="fname" dir="ltr" lang="en">${MDK.fmt(MDK.cellList(it, d.cols[0].id).join(', '))}</div><div class="vals" dir="ltr" lang="en">${d.cols.slice(1).map(c => MDK.fmt(MDK.cellList(it, c.id).join(', '))).join('<br>')}</div>`
+      : `<div class="fpic">${MDK.render(it)}</div><div class="fname" dir="ltr" lang="en">${esc(it.name)}</div>`;
+    return `<div class="fcard">${head}
       <div class="fstat">${n ? `${r.c}/${n} נכון${P.mastered(S.deck, it.id) ? ' · <b class="okc">נשלט</b>' : ''}` : 'עוד לא תורגל'}</div></div>`;
   }
   function browse() {
     stop();
-    const d = deck();
+    const d = deck(), isT = d.type === 'table';
+    const tableView = () => `<div class="twrap"><table class="tbl" dir="ltr" lang="en"><thead><tr>${d.cols.map(c => `<th>${esc(c.label)}</th>`).join('')}<th></th></tr></thead><tbody>${d.items.map(it => {
+      const r = P.item(d.id, it.id), n = r.c + r.w;
+      return `<tr>${d.cols.map(c => `<td>${MDK.fmt(MDK.cellList(it, c.id).join(', '))}</td>`).join('')}<td class="muted" dir="rtl">${n ? `${r.c}/${n}` : ''}${P.mastered(d.id, it.id) ? ' ✓' : ''}</td></tr>`; }).join('')}</tbody></table></div>`;
     app.innerHTML = `<div class="play"><div class="playbar"><button class="icon x" aria-label="חזרה">✕</button>
-      <h2 class="pb-title">${esc(d.title)}</h2>${hintBtn()}</div>
-      <main class="wrap">${Object.entries(d.cats).map(([k, l]) => {
+      <h2 class="pb-title">${esc(d.title)}</h2>${isT ? '' : hintBtn()}</div>
+      <main class="wrap">${isT ? tableView() : Object.entries(d.cats).map(([k, l]) => {
         const its = d.items.filter(x => x.cat === k);
         return its.length ? `<h3 class="cat-h"><span class="sw c-${k}"></span>${esc(l)}</h3><div class="grid">${its.map(card).join('')}</div>` : '';
       }).join('')}</main></div>`;
     window.scrollTo(0, 0);
     app.querySelector('.x').onclick = home;
-    app.querySelector('.hint-tg').onclick = () => setHints(!S.hints);
+    const ht = app.querySelector('.hint-tg'); if (ht) ht.onclick = () => setHints(!S.hints);
   }
 
   function confirmBox(text, yes) {
