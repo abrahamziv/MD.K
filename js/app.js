@@ -68,7 +68,8 @@
     const decks = subjectDecks(), subj = MDK.subjects[S.subject];
     app.innerHTML = `
     <header class="hero">
-      <div class="brand"><button class="logo back-logo" id="subjects" aria-label="חזרה לבחירת מקצוע">MD</button><div><h1>${esc(subj.title)}</h1><p>MD.K · אימון כרטיס אחרי כרטיס</p></div></div>
+      <div class="menu-row"><button class="menu-btn" id="subjects">כל המקצועות ›</button></div>
+      <div class="brand"><span class="logo" aria-hidden="true">MD</span><div><h1>${esc(subj.title)}</h1><p>MD.K · אימון כרטיס אחרי כרטיס</p></div></div>
       ${isT ? '' : `<div class="hero-mol" aria-hidden="true">${MDK.render(sample, 'show-hl')}<span dir="ltr">${esc(sample.name)}</span></div>`}
     </header>
     <main class="wrap">

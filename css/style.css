@@ -173,7 +173,9 @@ h1,h2,h3{margin:0;line-height:1.15;text-wrap:balance}
 .subj-b{margin-top:8px;font-size:.8rem;font-weight:700;padding:3px 10px;border-radius:99px;background:#2244d6;color:#fff}
 .subj.soon{opacity:.75}.subj.soon .subj-b{background:#8a92a0}
 .soon-pg{text-align:center;padding-top:48px}.soon-ic{font-size:3rem}
-.back-logo{border:0;cursor:pointer;font:inherit}
+.menu-row{flex-basis:100%}
+.menu-btn{min-height:40px;padding:6px 16px;border-radius:99px;border:1.5px solid rgba(255,255,255,.7);background:rgba(255,255,255,.15);color:#fff;font:500 15px/1 inherit;font-family:inherit;cursor:pointer}
+.menu-btn:hover{background:rgba(255,255,255,.28)}
 
 /* table decks */
 .tprompt{font-size:clamp(20px,5vw,28px)}
