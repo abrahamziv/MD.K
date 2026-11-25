@@ -2,5 +2,8 @@
   "name": "md-k",
   "private": true,
   "description": "Study platform for a medical acceptance exam. No build step; package.json only runs tests.",
-  "scripts": { "test": "node --test tests/*.test.js" }
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "stamp": "node tools/stamp.js"
+  }
 }

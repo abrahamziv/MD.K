@@ -75,3 +75,11 @@ npm test
 Uses Node's built-in test runner (Node 20+), no dependencies. `tests/decks.test.js` validates every registered deck
 automatically (unique ids, valid `confuse`/bond/hint references, every structure renders), so a new deck is checked
 the moment it is added. `tests/core.test.js` covers progress tracking, weighted sampling and distractors.
+
+## Releasing (cache busting)
+GitHub Pages lets browsers cache scripts for ~10 minutes, which can show a mix of old and new files (e.g. buttons that silently do nothing).
+`index.html` therefore links every script/stylesheet with `?v=<hash>`. After changing any `js/` or `css/` file run:
+```
+npm run stamp
+```
+`npm test` fails if the stamps are out of date.

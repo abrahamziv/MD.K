@@ -57,3 +57,8 @@ test('store survives corrupt / unavailable localStorage', () => {
 test('every script in index.html exists and loads', () => {
   const { srcs } = loadMDK(); assert.ok(srcs.length >= 5);
 });
+
+test('index.html cache-busting stamps are current (run `npm run stamp` after editing files)', () => {
+  const r = require('child_process').spawnSync('node', ['tools/stamp.js', '--check'], { cwd: require('./helpers').root, encoding: 'utf8' });
+  assert.equal(r.status, 0, r.stderr);
+});

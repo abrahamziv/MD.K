@@ -12,7 +12,7 @@ function loadMDK() {
   vm.createContext(sandbox);
   // same order as index.html: every script tag except app.js (needs a DOM)
   const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-  const srcs = [...html.matchAll(/<script src="([^"]+)"/g)].map(m => m[1]).filter(s => !s.endsWith('app.js'));
+  const srcs = [...html.matchAll(/<script src="([^"]+)"/g)].map(m => m[1].split('?')[0]).filter(s => !s.endsWith('app.js'));
   for (const s of srcs) vm.runInContext(fs.readFileSync(path.join(root, s), 'utf8'), sandbox, { filename: s });
   return { MDK: sandbox.MDK, mem, srcs };
 }
