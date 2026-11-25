@@ -56,3 +56,11 @@ Then add its `<script>` tag in `index.html`. It shows up in the game picker.
 
 ## Run locally
 Open `index.html` in a browser. That's it.
+
+## Tests
+```
+npm test
+```
+Uses Node's built-in test runner (Node 20+), no dependencies. `tests/decks.test.js` validates every registered deck
+automatically (unique ids, valid `confuse`/bond/hint references, every structure renders), so a new deck is checked
+the moment it is added. `tests/core.test.js` covers progress tracking, weighted sampling and distractors.
