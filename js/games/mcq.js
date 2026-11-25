@@ -1,6 +1,6 @@
 /* Game: multiple choice. Structure -> name, or name -> structure. */
 MDK.registerGame({
-  id: 'mcq',
+  id: 'mcq', types: ['structure'],
   title: 'שאלות אמריקאיות',
   desc: 'ארבע אפשרויות, אחת נכונה',
   start(stage, ctx) {

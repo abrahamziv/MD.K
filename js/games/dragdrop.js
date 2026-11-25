@@ -1,6 +1,6 @@
 /* Game: drag & drop matching (touch + mouse). Tap a chip, then tap a target, works too. */
 MDK.registerGame({
-  id: 'dnd',
+  id: 'dnd', types: ['structure'],
   title: 'גרירה והתאמה',
   desc: 'גררי כל כרטיס למקום שלו',
   start(stage, ctx) {

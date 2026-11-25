@@ -57,10 +57,31 @@ window.MDK = (function () {
     return out;
   }
 
+  /* ---------- table decks ----------
+     deck.type === 'table': deck.cols = [{id, label}], item.cells = { colId: 'text' | ['text', ...] }
+     Markup in cell text: ^sup^ and _sub_  (e.g. 'Cu^2+^', 'vitamin B_12_'). */
+  const fmt = s => esc(s).replace(/\^(.+?)\^/g, '<sup>$1</sup>').replace(/_(.+?)_/g, '<sub>$1</sub>');
+  const cellList = (item, col) => [].concat(item.cells[col]);
+
+  /* One question about a row: show a value from column f, ask for column t.
+     Cells holding several values (e.g. enzymes of an ion) work both ways:
+     every value the data supports is accepted as correct. */
+  function tableQ(deck, item, nOpts = 4) {
+    const ids = deck.cols.map(c => c.id), f = shuffle(ids)[0], t = shuffle(ids.filter(c => c !== f))[0];
+    const prompt = shuffle(cellList(item, f))[0];
+    const good = new Set();
+    for (const r of deck.items) if (cellList(r, f).includes(prompt)) cellList(r, t).forEach(v => good.add(v));
+    const answer = shuffle(cellList(item, t))[0];
+    const bad = shuffle([...new Set(deck.items.flatMap(r => cellList(r, t)))].filter(v => !good.has(v)));
+    return { from: f, to: t, prompt, answer, good, options: shuffle([answer, ...bad.slice(0, nOpts - 1)]) };
+  }
+
   return {
+    fmt, cellList, tableQ,
     decks, games, subjects, store, progress, shuffle, esc, pick, distractors,
     registerSubject(x) { subjects[x.id] = x; },
-    registerDeck(d) { decks[d.id] = d; },
+    registerDeck(d) { d.type = d.type || 'structure'; d.cats = d.cats || {}; decks[d.id] = d; },
+    gamesFor(deck) { return Object.values(games).filter(g => (g.types || ['structure']).includes(deck.type)); },
     registerGame(g) { games[g.id] = g; }
   };
 })();

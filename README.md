@@ -23,7 +23,17 @@ js/app.js                       screens: landing (subjects), home, play, summary
 js/decks/functional-groups.js   deck 1 (24 functional groups, after Lehninger Fig. 1-16)
 js/games/mcq.js                 game: multiple choice
 js/games/dragdrop.js            game: drag & drop
+js/games/tablemcq.js            game: table questions (table decks)
+js/games/tablefill.js           game: fill the table (table decks)
+js/decks/enzyme-tables.js       decks: Lehninger tables 6-1, 6-2, 6-3
 ```
+
+## Table decks (memorise-from-the-book tables)
+Decks with `type: 'table'` hold a table: `cols` plus one item per row (`cells`: a string, or an array when a row lists several values).
+Games for tables (`types: ['table']`): **Table questions** (`js/games/tablemcq.js`, any column -> any column, 4 options,
+many-to-many cells accept every correct answer) and **Fill the table** (`js/games/tablefill.js`, blanks in the book's layout).
+Text markup in cells: `^sup^`, `_sub_`. Data entered so far: Lehninger tables 6-1, 6-2, 6-3 (`js/decks/enzyme-tables.js`).
+A game declares which deck types it supports with `types` (default `['structure']`).
 
 ## Adding a new deck
 1. Copy `js/decks/functional-groups.js` to `js/decks/<new-deck>.js`.
