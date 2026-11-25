@@ -1,7 +1,7 @@
 # MD.K
 
 A study web app for practicing biochemistry for the medical exam. Hebrew UI, English terms, same as the exam.
-Works on phone, iPad and laptop. No build step, no server: plain HTML/CSS/JS.
+Works on phone, iPad and laptop. No build step, no server: plain HTML/CSS/JS. Published at - https://abrahamziv.github.io/MD.K/
 
 ## Games
 | Game | What it does |
