@@ -2,6 +2,7 @@
    To add a deck: copy this file, change id/title/items, add a <script> tag in index.html. */
 MDK.registerDeck({
   id: 'functional-groups',
+  subject: 'biochem',
   title: 'קבוצות פונקציונליות',
   subtitle: 'קבוצות נפוצות בביומולקולות',
   source: 'לפי Lehninger, Principles of Biochemistry',

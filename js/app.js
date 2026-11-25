@@ -1,9 +1,10 @@
 /* App shell: home/setup, play, summary, browse. */
 {
   const app = document.getElementById('app'), esc = MDK.esc, P = MDK.progress;
-  const S = Object.assign({ deck: Object.keys(MDK.decks)[0], game: 'mcq', dir: 's2n', n: 10, cats: [], hints: false, weak: false },
+  const S = Object.assign({ subject: null, deck: Object.keys(MDK.decks)[0], game: 'mcq', dir: 's2n', n: 10, cats: [], hints: false, weak: false },
     MDK.store.get('settings', {}));
   if (!MDK.decks[S.deck]) S.deck = Object.keys(MDK.decks)[0];
+  const subjectDecks = () => Object.values(MDK.decks).filter(x => x.subject === S.subject);
   const save = () => MDK.store.set('settings', S);
   const deck = () => MDK.decks[S.deck];
   let running = null;
@@ -22,15 +23,49 @@
     `<button role="radio" aria-checked="${S[key] === v}" data-k="${key}" data-v="${v}">${l}</button>`).join('')}</div>`;
   const hintBtn = () => `<button class="hint-tg" aria-pressed="${S.hints}"><span class="dot"></span>רמזי צבע</button>`;
 
-  /* ---------- home ---------- */
-  function home() {
-    stop();
-    const d = deck(), items = d.items, mast = items.filter(x => P.mastered(d.id, x.id)).length;
-    const weakN = items.filter(x => P.weak(d.id, x.id)).length, sample = items[Math.random() * items.length | 0];
-    const decks = Object.values(MDK.decks);
+  /* ---------- landing: choose a subject ---------- */
+  function landing() {
+    stop(); S.subject = null; save();
     app.innerHTML = `
     <header class="hero">
-      <div class="brand"><span class="logo" aria-hidden="true">MD</span><div><h1>MD.K</h1><p>אימון למבחן, כרטיס אחרי כרטיס</p></div></div>
+      <div class="brand"><span class="logo" aria-hidden="true">MD</span><div><h1>MD.K</h1><p>הכנה למבחן המיון לרפואה</p></div></div>
+    </header>
+    <main class="wrap">
+      <h2 class="land-h">בחרי מקצוע</h2>
+      <div class="subjects">${Object.values(MDK.subjects).map(x => {
+        const live = Object.values(MDK.decks).some(d => d.subject === x.id);
+        return `<button class="subj ${live ? '' : 'soon'}" data-s="${esc(x.id)}">
+          <span class="subj-t">${esc(x.title)}</span><span class="subj-en" dir="ltr" lang="en">${esc(x.en)}</span>
+          <span class="subj-b">${live ? 'לתרגול' : 'בקרוב'}</span></button>`; }).join('')}</div>
+    </main>`;
+    window.scrollTo(0, 0);
+    app.querySelectorAll('.subj').forEach(b => b.onclick = () => openSubject(b.dataset.s));
+  }
+  function openSubject(id) {
+    const ds = Object.values(MDK.decks).filter(d => d.subject === id);
+    if (!ds.length) return soon(id);
+    S.subject = id; if (!ds.some(d => d.id === S.deck)) { S.deck = ds[0].id; S.cats = []; }
+    save(); home();
+  }
+  function soon(id) {
+    const x = MDK.subjects[id];
+    app.innerHTML = `<div class="play"><div class="playbar"><button class="icon x" aria-label="חזרה">✕</button><h2 class="pb-title">${esc(x.title)}</h2></div>
+      <main class="wrap soon-pg fade"><div class="soon-ic" aria-hidden="true">🚧</div><h2>${esc(x.title)} — בקרוב</h2>
+      <p class="muted">עוד אין כאן חומר. מוסיפים אותו בהדרגה.</p>
+      <button class="btn primary" id="back">לבחירת מקצוע</button></main></div>`;
+    app.querySelector('.x').onclick = landing; app.querySelector('#back').onclick = landing;
+  }
+
+  /* ---------- home (inside a subject) ---------- */
+  function home() {
+    stop();
+    if (!S.subject) return landing();
+    const d = deck(), items = d.items, mast = items.filter(x => P.mastered(d.id, x.id)).length;
+    const weakN = items.filter(x => P.weak(d.id, x.id)).length, sample = items[Math.random() * items.length | 0];
+    const decks = subjectDecks(), subj = MDK.subjects[S.subject];
+    app.innerHTML = `
+    <header class="hero">
+      <div class="brand"><button class="logo back-logo" id="subjects" aria-label="חזרה לבחירת מקצוע">MD</button><div><h1>${esc(subj.title)}</h1><p>MD.K · אימון כרטיס אחרי כרטיס</p></div></div>
       <div class="hero-mol" aria-hidden="true">${MDK.render(sample, 'show-hl')}<span dir="ltr">${esc(sample.name)}</span></div>
     </header>
     <main class="wrap">
@@ -71,6 +106,7 @@
     app.querySelectorAll('.deck-tab').forEach(b => b.onclick = () => { S.deck = b.dataset.deck; S.cats = []; save(); home(); });
     app.querySelector('.hint-tg').onclick = () => setHints(!S.hints);
     app.querySelector('#weak').onclick = () => { S.weak = !S.weak; save(); home(); };
+    app.querySelector('#subjects').onclick = landing;
     app.querySelector('#browse').onclick = browse;
     app.querySelector('#reset').onclick = () => confirmBox('לאפס את כל ההתקדמות בחפיסה הזו?', () => { P.reset(d.id); S.weak = false; save(); home(); });
     app.querySelector('#go').onclick = () => {
@@ -151,5 +187,5 @@
   }
 
   function stop() { if (running && running.stop) running.stop(); running = null; }
-  home();
+  S.subject ? home() : landing();
 }

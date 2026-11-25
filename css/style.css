@@ -162,3 +162,15 @@ h1,h2,h3{margin:0;line-height:1.15;text-wrap:balance}
 .fade{animation:fade .25s ease-out}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* landing + coming soon */
+.land-h{margin:8px 0 14px}
+.subjects{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.subj{display:flex;flex-direction:column;gap:6px;align-items:flex-start;text-align:start;padding:20px;border-radius:18px;border:1.5px solid var(--line,#d9dde8);background:var(--card,#fff);color:inherit;font:inherit;cursor:pointer;transition:transform .12s,box-shadow .12s}
+.subj:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.subj-t{font-size:1.25rem;font-weight:700}
+.subj-en{color:var(--muted,#667);font-size:.9rem}
+.subj-b{margin-top:8px;font-size:.8rem;font-weight:700;padding:3px 10px;border-radius:99px;background:#2244d6;color:#fff}
+.subj.soon{opacity:.75}.subj.soon .subj-b{background:#8a92a0}
+.soon-pg{text-align:center;padding-top:48px}.soon-ic{font-size:3rem}
+.back-logo{border:0;cursor:pointer;font:inherit}
