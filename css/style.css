@@ -190,4 +190,7 @@ h1,h2,h3{margin:0;line-height:1.15;text-wrap:balance}
 .tchip.used{opacity:.3}
 .tfill-tray{display:flex;flex-wrap:wrap;gap:8px}
 .trow-card .vals{font-size:13px;color:var(--muted);line-height:1.5}
-.tfill-tray{max-height:38vh;overflow-y:auto}
+.tfill-tray{max-height:30vh;overflow-y:auto;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+.tfill{padding-bottom:12px}
+.hole.over{background:var(--brand);border-style:solid}
+.tchip.lifted{opacity:.3}
