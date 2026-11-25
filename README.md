@@ -16,9 +16,10 @@ weighted practice (missed cards come back more often), progress saved in the bro
 ```
 index.html                      entry point; lists all script files
 css/style.css                   all styling (light + dark)
+js/subjects.js                  the 4 exam subjects (opening screen)
 js/core.js                      registries, progress, sampling, distractors
 js/render.js                    structure data -> SVG
-js/app.js                       screens: home, play, summary, browse
+js/app.js                       screens: landing (subjects), home, play, summary, browse
 js/decks/functional-groups.js   deck 1 (24 functional groups, after Lehninger Fig. 1-16)
 js/games/mcq.js                 game: multiple choice
 js/games/dragdrop.js            game: drag & drop
@@ -26,7 +27,7 @@ js/games/dragdrop.js            game: drag & drop
 
 ## Adding a new deck
 1. Copy `js/decks/functional-groups.js` to `js/decks/<new-deck>.js`.
-2. Change `id`, `title`, `subtitle`, `cats` and the `items`.
+2. Change `id`, `subject` (one of the ids in `js/subjects.js`), `title`, `subtitle`, `cats` and the `items`.
 3. Add `<script src="js/decks/<new-deck>.js"></script>` in `index.html` under "decks".
 
 A deck tab appears on the home screen automatically.

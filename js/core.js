@@ -1,7 +1,7 @@
 /* MD.K — core: registries, storage, progress, helpers.
    Decks call MDK.registerDeck({...}); games call MDK.registerGame({...}). */
 window.MDK = (function () {
-  const decks = {}, games = {};
+  const decks = {}, games = {}, subjects = {};
 
   const store = {
     get(k, d) { try { const v = localStorage.getItem('mdk.' + k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
@@ -58,7 +58,8 @@ window.MDK = (function () {
   }
 
   return {
-    decks, games, store, progress, shuffle, esc, pick, distractors,
+    decks, games, subjects, store, progress, shuffle, esc, pick, distractors,
+    registerSubject(x) { subjects[x.id] = x; },
     registerDeck(d) { decks[d.id] = d; },
     registerGame(g) { games[g.id] = g; }
   };

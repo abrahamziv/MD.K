@@ -33,3 +33,8 @@ for (const d of decks) test(`deck "${d.id}" is well-formed`, () => {
     assert.match(MDK.render(it), /^<svg/, `${w}: render not svg`);
   }
 });
+
+test('four exam subjects registered, and every deck belongs to one', () => {
+  assert.deepEqual(Object.keys(MDK.subjects), ['biochem', 'molbio', 'cellbio', 'physio']);
+  for (const d of decks) assert.ok(MDK.subjects[d.subject], `deck "${d.id}" has unknown subject "${d.subject}"`);
+});
